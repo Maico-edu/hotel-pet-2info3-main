@@ -80,11 +80,11 @@ onMounted(carregarTutores)
         required
         >
         </select>
-
+        <select>
         <option value="" disabled>Selecione a espécie</option>
-        <option value="Cachorro" disabled>Cachorro</option>
-        <option value="Gato" disabled>Gato</option>
-
+        <option value="Cachorro" >Cachorro</option>
+        <option value="Gato">Gato</option>
+        </select>
 
      </div>
 
