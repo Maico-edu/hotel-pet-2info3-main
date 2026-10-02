@@ -10,20 +10,17 @@ async function carregarDados() {
   const respostaPets = await fetch(`${API_URL}/pets`);
   pets.value = await respostaPets.json();
 
-  console.log('Pets carregados:', pets.value);
-
   const respostaTutores = await fetch(`${API_URL}/tutores`);
   tutores.value = await respostaTutores.json();
-  console.log('Tutores carregados:', tutores.value);     
 }
 
 function nomeDoTutor(tutorId) {
-  for(const tutor of tutores.value) {
-    if(tutor.id === tutorId) {
-      return tutor.nome
+  for (const tutor of tutores.value) {
+    if (tutor.id === tutorId) {
+      return tutor.nome;
     }
   }
-  return "Tutor náo encontrado";
+  return 'Tutor não encontrado';
 }
 
 onMounted(carregarDados);
@@ -39,12 +36,13 @@ onMounted(carregarDados);
     </header>
   </div>
 
-  <table class="table tables-striped tables--hover">
+  <table class="table table-striped table-hover">
     <thead>
       <th>ID</th>
       <th>Nome</th>
       <th>Espécie</th>
       <th>Tutor</th>
+      <th>Açoẽs</th>
     </thead>
     <tbody>
       <tr
@@ -55,6 +53,12 @@ onMounted(carregarDados);
         <td>{{ pet.nome }}</td>
         <td>{{ pet.especie }}</td>
         <td>{{ nomeDoTutor(pet.tutorId) }}</td>
+        <td>
+          <RouterLink :to="`/pets/${pet.id}`">
+            Editar
+          </RouterLink>  
+          
+          / Excluir</td>
       </tr>
     </tbody>
   </table>

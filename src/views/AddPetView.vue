@@ -2,49 +2,50 @@
 import { onMounted, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 
-// chamndo a minha APIA para exibir os dados do tutor
-const API_URL = "http://localhost:3000"
-const router = useRouter()
+// chamando a minha API para exibir os dados de Tutor
+const API_URL = 'http://localhost:3000';
+const router = useRouter();
 
-//  wxibindo a lista de tutores da aplicação
+// exibindo a lista de tutores da aplicação
 const tutores = ref([]);
 
 async function carregarTutores() {
-        const resposta = await fetch(`${API-URL}/tutores`);
-        console.log('tutores', resposta)
-        // transformando os valores da minha API para o formato JSON
-        tutores.value = await resposta.json();
+  const resposta = await fetch(`${API_URL}/tutores`);
+  console.log('tutores', resposta.json);
+  // tranformando os valores da minha API para o formato JSON
+  tutores.value = await resposta.json();
 }
-// chamdno a minha API para salvar os dados dos pet
+
+// chamando a minha API para salvar os dados de Pet
 const novoPet = ref({
-    nome: "",
-    especie: "",
-    tutorId: "",
+  nome: '',
+  especie: '',
+  tutorId: '',
 });
 
 async function salvarPet() {
-    //  fazendo uma requisição ára o servidor
-    await fetch(`${API_URL}/pets`,{
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(novoPet.value),
-    }),
-    router.push('/pet');
+  // fazendo uma requisição para o servidor
+  await fetch(`${API_URL}/pets`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(novoPet.value),
+  });
+  router.push('/pets');
 }
 
-onMounted(carregarTutores)
+onMounted(carregarTutores);
 </script>
 
 <template>
   <div>
     <header class="mb-4">
-      <h1 class="text-2xl font-bold">Listagem de Pets</h1>
+      <h1 class="text-2xl font-bold">Cadastro de Pets</h1>
       <p class="text-body-secondary mb-0">Cadastro de Pets no sistema.</p>
     </header>
-
-    <!-- <RouterLink
+    <!--
+    <RouterLink
       class="btn btn-primary"
       :to="{ name: 'addPet' }"
     >
@@ -52,67 +53,78 @@ onMounted(carregarTutores)
     </RouterLink> -->
 
     <form @submit.prevent="salvarPet">
-        <div class="col-md-6">
-            <label for="nome" class="forme-label"
-            >nome do Pet</label
+      <div class="col-md-6">
+        <label
+          for="nome"
+          class="form-label"
+          >Nome do Pet:</label
         >
-        <input 
-        type="text"
-        id="nome"
-        v-model="novoPet.nome"
-        class="form-control"
-        required
+        <input
+          type="text"
+          id="nome"
+          v-model="novoPet.nome"
+          class="form-control"
+          required
         />
-     </div>
+      </div>
 
-
-     <div class="col-md-6">
-        <label for="especie"
-        class="form-label"
+      <div class="col-md-6">
+        <label
+          for="especie"
+          class="form-label"
         >
-
-       
-        especie</label
+          Espécie</label
         >
-
-         <select v-model="novoPet.especie" 
-        class="form-select"
-        required
+        <select
+          v-model="novoPet.especie"
+          class="form-select"
+          required
         >
+          <option
+            value=""
+            disabled
+          >
+            Selecione a Espécie
+          </option>
+          <option value="Cachorro">Cachorro</option>
+          <option value="Gato">Gato</option>
         </select>
-        <select>
-        <option value="" disabled>Selecione a espécie</option>
-        <option value="Cachorro" >Cachorro</option>
-        <option value="Gato">Gato</option>
+      </div>
+
+      <div class="col-md-6">
+        <label
+          for="tutor"
+          class="form-label"
+        >
+          Tutor</label
+        >
+        <select
+          v-model="novoPet.tutorId"
+          class="form-select"
+          required
+        >
+          <option
+            value=""
+            disabled
+          >
+            Selecione um Tutor
+          </option>
+          <option
+            v-for="tutor in tutores"
+            :key="tutor.id"
+            :value="tutor.id"
+          >
+            {{ tutor.nome }}
+          </option>
         </select>
+      </div>
 
-     </div>
-
-     <!-- dividindo os dois -->
-
-     <div class="col-md-6">
-        <label for="especie"
-        class="form-label"
-        >
-        selecione um Tutor
-       </label
-        >
-
-         <select v-model="novoPet.tutorId" 
-        class="form-select"
-        required
-        >
-        <option 
-        value=""
-        disabled>
-        Selecione um tutor
-        </option>
-        </select> 
-        <option v-for="tutor in tutores" :key="tutor.id" :value="tutor.id" >{{ tutor.nome }}</option>
-     </div>
-     <button type="submit" class="btn btn-success">Salvar pet</button>
+      <button
+        type="submit"
+        class="btn btn-success"
+      >
+        Salvar Pet
+      </button>
     </form>
-
   </div>
 </template>
-
