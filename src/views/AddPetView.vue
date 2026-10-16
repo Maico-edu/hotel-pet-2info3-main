@@ -1,30 +1,23 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import { RouterLink, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 
-// chamando a minha API para exibir os dados de Tutor
 const API_URL = 'http://localhost:3000';
 const router = useRouter();
 
-// exibindo a lista de tutores da aplicação
 const tutores = ref([]);
-
-async function carregarTutores() {
-  const resposta = await fetch(`${API_URL}/tutores`);
-  console.log('tutores', resposta.json);
-  // tranformando os valores da minha API para o formato JSON
-  tutores.value = await resposta.json();
-}
-
-// chamando a minha API para salvar os dados de Pet
 const novoPet = ref({
   nome: '',
   especie: '',
   tutorId: '',
 });
 
+async function carregarTutores() {
+  const resposta = await fetch(`${API_URL}/tutores`);
+  tutores.value = await resposta.json();
+}
+
 async function salvarPet() {
-  // fazendo uma requisição para o servidor
   await fetch(`${API_URL}/pets`, {
     method: 'POST',
     headers: {
@@ -32,6 +25,7 @@ async function salvarPet() {
     },
     body: JSON.stringify(novoPet.value),
   });
+
   router.push('/pets');
 }
 
@@ -42,27 +36,24 @@ onMounted(carregarTutores);
   <div>
     <header class="mb-4">
       <h1 class="text-2xl font-bold">Cadastro de Pets</h1>
-      <p class="text-body-secondary mb-0">Cadastro de Pets no sistema.</p>
+      <p class="text-body-secondary mb-0">Cadastro de pets no sistema.</p>
     </header>
-    <!--
-    <RouterLink
-      class="btn btn-primary"
-      :to="{ name: 'addPet' }"
-    >
-      Adicionar Pet
-    </RouterLink> -->
 
-    <form @submit.prevent="salvarPet">
+    <form
+      @submit.prevent="salvarPet"
+      class="row g-3"
+    >
       <div class="col-md-6">
         <label
           for="nome"
           class="form-label"
-          >Nome do Pet:</label
         >
+          Nome do Pet
+        </label>
         <input
-          type="text"
           id="nome"
           v-model="novoPet.nome"
+          type="text"
           class="form-control"
           required
         />
@@ -73,9 +64,10 @@ onMounted(carregarTutores);
           for="especie"
           class="form-label"
         >
-          Espécie</label
-        >
+          Espécie
+        </label>
         <select
+          id="especie"
           v-model="novoPet.especie"
           class="form-select"
           required
@@ -84,7 +76,7 @@ onMounted(carregarTutores);
             value=""
             disabled
           >
-            Selecione a Espécie
+            Selecione a espécie
           </option>
           <option value="Cachorro">Cachorro</option>
           <option value="Gato">Gato</option>
@@ -96,9 +88,10 @@ onMounted(carregarTutores);
           for="tutor"
           class="form-label"
         >
-          Tutor</label
-        >
+          Tutor
+        </label>
         <select
+          id="tutor"
           v-model="novoPet.tutorId"
           class="form-select"
           required
@@ -107,7 +100,7 @@ onMounted(carregarTutores);
             value=""
             disabled
           >
-            Selecione um Tutor
+            Selecione um tutor
           </option>
           <option
             v-for="tutor in tutores"
@@ -119,12 +112,14 @@ onMounted(carregarTutores);
         </select>
       </div>
 
-      <button
-        type="submit"
-        class="btn btn-success"
-      >
-        Salvar Pet
-      </button>
+      <div class="col-12">
+        <button
+          type="submit"
+          class="btn btn-success"
+        >
+          Salvar Pet
+        </button>
+      </div>
     </form>
   </div>
 </template>

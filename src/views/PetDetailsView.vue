@@ -9,8 +9,6 @@ const router =useRoute();
 
 const API_URL = 'http://localhost:3000'
 
-// criando variaveis reativas pata armazenar os dados dos pet e dos tutores
-
 const pet = ref({});
 const tutor = ref({});
 
@@ -19,7 +17,7 @@ async function carregarPet() {
   try {
     const respostaPet = await(fetch(`${API_URL}/pets/${router.params.id}`));
     if(!respostaPet.ok) {
-      console.log( "Opees, Pet não encontrado!")
+      console.log( "Opssss, Pet não encontrado!")
     }
 
     pet.value = await respostaPet.json();
@@ -39,6 +37,5 @@ onMounted(carregarPet);
 
   <h1>Nome: {{ pet.nome }}</h1>
   <p>espécia: {{ pet.especie }}</p>
-  <!-- <p>Tutor: {{ nomeDoTutor(pet.tutorId) }}</p> -->
-
+  <p>Tutor: {{ tutor.nome || 'Tutor não encontrado' }}</p>
 </template>
