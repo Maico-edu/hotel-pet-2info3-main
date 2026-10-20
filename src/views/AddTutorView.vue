@@ -244,23 +244,27 @@ async function salvarTutor() {
           placeholder="00000-000"
           required
         />
-      </div>
+        <div id="aviso" class="alert alert-danger d-none mt-3">
+             Preencha todos os campos obrigatórios!
+        </div>
 
-      <div class="">
-        <div class="">
+      </div>
+      <div class="row m">
+
+        <div class="col-md-1 m-4">
           <button
             type="button"
             @click="router.push('/tutores')"
-            class="vsfd"
+            class="btn btn-outline-primary"
           >
             cancelar
           </button>
         </div>
 
-        <div class="col-12">
+        <div class="col-md-1 m-4">
           <button
             type="submit"
-            class="vsfd"
+            class="btn btn-primary"
           >
             Cadastrar Tutor
           </button>

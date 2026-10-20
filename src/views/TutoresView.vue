@@ -77,12 +77,20 @@ onMounted(carregar);
         <td>{{ tutor.telefone || 'Telefone não informado' }}</td>
         <td>{{ contarPets(tutor.id) }}</td>
         <td>
-          <button
-            class="btn btn-sm btn-danger"
-            @click="excluir(tutor.id)"
-          >
-            Excluir
-          </button>
+          <div class="d-flex gap-2">
+            <button
+              class="btn btn-sm btn-danger"
+              @click="excluir(tutor.id)"
+            >
+              Excluir
+            </button>
+            <RouterLink
+              class="btn btn-sm btn-primary"
+              :to="`/tutores/${tutor.id}`"
+            >
+              Visualizar
+            </RouterLink>
+          </div>
         </td>
       </tr>
     </tbody>
