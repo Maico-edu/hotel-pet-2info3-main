@@ -2,27 +2,40 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-
-const API_URL = 'http://localhost:3000';
+import { mensagemErroApi, tutorService } from '@/services/api';
 const router = useRouter();
 
+const erro = ref('');
+const salvando = ref(false);
 const novoTutor = ref({
   nome: '',
   telefone: '',
   Email: '',
   Cpf: '',
+  dataNascimento: '',
+  rua: '',
+  numero: '',
+  bairro: '',
+  cidade: '',
+  cep: '',
+  estado: '',
 });
 
 async function salvarTutor() {
-  await fetch(`${API_URL}/tutores`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(novoTutor.value),
-  });
+  erro.value = '';
+  salvando.value = true;
 
-  router.push('/tutores');
+  try {
+    await tutorService.cadastrar(novoTutor.value);
+    router.push('/tutores');
+  } catch (erroApi) {
+    erro.value = mensagemErroApi(
+      erroApi,
+      'Não foi possível cadastrar o tutor.',
+    );
+  } finally {
+    salvando.value = false;
+  }
 }
 </script>
 
@@ -33,6 +46,14 @@ async function salvarTutor() {
       <p class="text-body-secondary mb-0">Cadastro de tutores no sistema</p>
       <h3><br /> Dados do Tutor <br /></h3>
     </header>
+
+    <p
+      v-if="erro"
+      class="alert alert-danger"
+      role="alert"
+    >
+      {{ erro }}
+    </p>
 
     <form
       @submit.prevent="salvarTutor"
@@ -46,12 +67,11 @@ async function salvarTutor() {
           ID
         </label>
         <input
-          id="nomeTutor"
-          v-model="novoTutor.nome"
+          id="idTutor"
           type="text"
           class="form-control"
           placeholder="Gerado automaticamente"
-          required
+          disabled
         />
       </div>
 
@@ -265,8 +285,9 @@ async function salvarTutor() {
           <button
             type="submit"
             class="btn btn-primary"
+            :disabled="salvando"
           >
-            Cadastrar Tutor
+            {{ salvando ? 'Salvando...' : 'Cadastrar Tutor' }}
           </button>
         </div>
       </div>

@@ -1,18 +1,33 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { RouterLink } from 'vue-router';
-
-const API_URL = 'http://localhost:3000';
+import { mensagemErroApi, petService, tutorService } from '@/services/api';
 
 const tutores = ref([]);
 const pets = ref([]);
+const erro = ref('');
+const carregando = ref(false);
 
 async function carregar() {
-  const respostaTutores = await fetch(`${API_URL}/tutores`);
-  tutores.value = await respostaTutores.json();
+  carregando.value = true;
+  erro.value = '';
 
-  const respostaPets = await fetch(`${API_URL}/pets`);
-  pets.value = await respostaPets.json();
+  try {
+    const [listaTutores, listaPets] = await Promise.all([
+      tutorService.listar(),
+      petService.listar(),
+    ]);
+
+    tutores.value = listaTutores;
+    pets.value = listaPets;
+  } catch (erroApi) {
+    erro.value = mensagemErroApi(
+      erroApi,
+      'Não foi possível carregar tutores e pets.',
+    );
+  } finally {
+    carregando.value = false;
+  }
 }
 
 function contarPets(tutorId) {
@@ -28,11 +43,15 @@ async function excluir(id) {
     return;
   }
 
-  await fetch(`${API_URL}/tutores/${id}`, {
-    method: 'DELETE',
-  });
-
-  await carregar();
+  try {
+    await tutorService.excluir(id);
+    await carregar();
+  } catch (erroApi) {
+    erro.value = mensagemErroApi(
+      erroApi,
+      'Não foi possível excluir o tutor.',
+    );
+  }
 }
 
 onMounted(carregar);
@@ -56,6 +75,27 @@ onMounted(carregar);
       </RouterLink>
     </div>
   </div>
+
+  <p
+    v-if="erro"
+    class="alert alert-danger"
+    role="alert"
+  >
+    {{ erro }}
+  </p>
+  <p
+    v-else-if="carregando"
+    class="text-body-secondary"
+    role="status"
+  >
+    Carregando tutores...
+  </p>
+  <p
+    v-else-if="tutores.length === 0"
+    class="text-body-secondary"
+  >
+    Nenhum tutor cadastrado.
+  </p>
 
   <table class="table table-striped table-hover">
     <thead>

@@ -92,6 +92,7 @@ Consulte o [guia de estrutura do projeto](./docs/estrutura-projeto.md).
 
 ## Documentação
 
+- [Integração planejada com a API FastAPI](./docs/06-integracao-api-fastapi.md);
 - [Como utilizar o template](./docs/como-utilizar-template.md);
 - [Estrutura do projeto](./docs/estrutura-projeto.md);
 - [Guia de padronização do código](./docs/guia-padronizacao-codigo.md);

@@ -1,24 +1,27 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
+import { mensagemErroApi, tutorService } from '@/services/api';
 
 const route = useRoute();
 const tutor = ref({});
 const erro = ref('');
+const carregando = ref(true);
 
 onMounted(async () => {
   try {
-    const resposta = await fetch(
-      `http://localhost:3000/tutores/${route.params.id}`,
-    );
-
-    if (resposta.ok) {
-      tutor.value = await resposta.json();
-    } else {
+    tutor.value = await tutorService.buscarPorId(route.params.id);
+  } catch (erroApi) {
+    if (erroApi.response?.status === 404) {
       erro.value = 'Tutor não encontrado.';
+    } else {
+      erro.value = mensagemErroApi(
+        erroApi,
+        'Não foi possível carregar os dados do tutor.',
+      );
     }
-  } catch {
-    erro.value = 'Não foi possível carregar os dados do tutor.';
+  } finally {
+    carregando.value = false;
   }
 });
 </script>
@@ -27,9 +30,16 @@ onMounted(async () => {
   <RouterLink to="/tutores">Voltar para tutores</RouterLink>
   <h1>Dados do tutor</h1>
 
+  <p
+    v-if="carregando"
+    class="text-body-secondary"
+    role="status"
+  >
+    Carregando dados do tutor...
+  </p>
   <p v-if="erro">{{ erro }}</p>
 
-  <div v-else>
+  <div v-else-if="!carregando">
     <p><strong>Nome:</strong> {{ tutor.nome }}</p>
     <p><strong>Telefone:</strong> {{ tutor.telefone }}</p>
     <p><strong>E-mail:</strong> {{ tutor.Email  }}</p>

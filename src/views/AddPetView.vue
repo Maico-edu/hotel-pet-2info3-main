@@ -1,11 +1,12 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-
-const API_URL = 'http://localhost:3000';
+import { mensagemErroApi, petService, tutorService } from '@/services/api';
 const router = useRouter();
 
 const tutores = ref([]);
+const erro = ref('');
+const salvando = ref(false);
 const novoPet = ref({
   nome: '',
   especie: '',
@@ -13,20 +14,28 @@ const novoPet = ref({
 });
 
 async function carregarTutores() {
-  const resposta = await fetch(`${API_URL}/tutores`);
-  tutores.value = await resposta.json();
+  try {
+    tutores.value = await tutorService.listar();
+  } catch (erroApi) {
+    erro.value = mensagemErroApi(
+      erroApi,
+      'Não foi possível carregar a lista de tutores.',
+    );
+  }
 }
 
 async function salvarPet() {
-  await fetch(`${API_URL}/pets`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(novoPet.value),
-  });
+  erro.value = '';
+  salvando.value = true;
 
-  router.push('/pets');
+  try {
+    await petService.cadastrar(novoPet.value);
+    router.push('/pets');
+  } catch (erroApi) {
+    erro.value = mensagemErroApi(erroApi, 'Não foi possível cadastrar o pet.');
+  } finally {
+    salvando.value = false;
+  }
 }
 
 onMounted(carregarTutores);
@@ -38,6 +47,14 @@ onMounted(carregarTutores);
       <h1 class="text-2xl font-bold">Cadastro de Pets</h1>
       <p class="text-body-secondary mb-0">Cadastro de pets no sistema.</p>
     </header>
+
+    <p
+      v-if="erro"
+      class="alert alert-danger"
+      role="alert"
+    >
+      {{ erro }}
+    </p>
 
     <form
       @submit.prevent="salvarPet"
@@ -116,8 +133,9 @@ onMounted(carregarTutores);
         <button
           type="submit"
           class="btn btn-success"
+          :disabled="salvando"
         >
-          Salvar Pet
+          {{ salvando ? 'Salvando...' : 'Salvar Pet' }}
         </button>
       </div>
     </form>

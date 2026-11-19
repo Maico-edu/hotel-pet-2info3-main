@@ -1,41 +1,49 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
+import { mensagemErroApi, petService, tutorService } from '@/services/api';
 
-// chamando o useRouter
-
-const router =useRoute();
-// chamndo a nossa API
-
-const API_URL = 'http://localhost:3000'
-
+const route = useRoute();
 const pet = ref({});
 const tutor = ref({});
+const erro = ref('');
 
-// funçao para carregar os dados do pet e do tutor
 async function carregarPet() {
   try {
-    const respostaPet = await(fetch(`${API_URL}/pets/${router.params.id}`));
-    if(!respostaPet.ok) {
-      console.log( "Opssss, Pet não encontrado!")
+    pet.value = await petService.buscarPorId(route.params.id);
+
+    try {
+      tutor.value = await tutorService.buscarPorId(pet.value.tutorId);
+    } catch (erroTutor) {
+      if (erroTutor.response?.status === 404) {
+        tutor.value = { nome: 'Tutor não encontrado' };
+      } else {
+        throw erroTutor;
+      }
     }
-
-    pet.value = await respostaPet.json();
-
-    const respostaTutor = await(fetch(`${API_URL}/tutores/${pet.value.tutorId}`));
-    tutor.value = respostaTutor.ok ? await respostaTutor.json() : { nome: 'Tutor não encontrad'};
-  } catch (erro) {
-    console.erro('Erro ao carregar os dados do pet e do tutor:', erro);
+  } catch (erroApi) {
+    erro.value = mensagemErroApi(
+      erroApi,
+      'Não foi possível carregar os dados do pet.',
+    );
   }
 }
-
 
 onMounted(carregarPet);
 </script>
 
 <template>
-
-  <h1>Nome: {{ pet.nome }}</h1>
-  <p>espécia: {{ pet.especie }}</p>
-  <p>Tutor: {{ tutor.nome || 'Tutor não encontrado' }}</p>
+  <RouterLink to="/pets">Voltar para pets</RouterLink>
+  <p
+    v-if="erro"
+    class="alert alert-danger mt-3"
+    role="alert"
+  >
+    {{ erro }}
+  </p>
+  <template v-else>
+    <h1>Nome: {{ pet.nome }}</h1>
+    <p>espécia: {{ pet.especie }}</p>
+    <p>Tutor: {{ tutor.nome || 'Tutor não encontrado' }}</p>
+  </template>
 </template>
